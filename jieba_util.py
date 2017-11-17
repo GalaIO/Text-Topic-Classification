@@ -8,11 +8,12 @@ import os
 try:
     sw_file = open('resource/stop_words.txt')
     stop_words = [word.strip().decode('utf-8') for word in sw_file.readlines()]
+    # stop_words = []
     # print stop_words
 finally:
     sw_file.close()
 
-def docdir_handler(dir_path, f):
+def docdir_handler(dir_path, f, stop_wordss=stop_words):
     '''
     对某一目录下的所有文档，进行遍历分词和对每篇执行f回调函数
     :param dir_path:
@@ -37,12 +38,12 @@ def docdir_handler(dir_path, f):
         seg_list = jieba.cut(td_content)
         for word in seg_list:
             word = word.strip()
-            if len(word) > 0 and word not in stop_words:
+            if len(word) > 0 and word not in stop_wordss:
                 f(index, word)
         index += 1
 
 
-def docfile_handler(filepath, f):
+def docfile_handler(filepath, f, stop_wordss=stop_words):
     '''
     对某文档，进行遍历分词和对每篇执行f回调函数
     :param dir_path:
@@ -57,7 +58,7 @@ def docfile_handler(filepath, f):
     seg_list = jieba.cut(td_content)
     for word in seg_list:
         word = word.strip()
-        if len(word) > 0 and word not in stop_words:
+        if len(word) > 0 and word not in stop_wordss:
             f(0, word)
 
 if __name__ == '__main__':
