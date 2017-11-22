@@ -18,7 +18,7 @@ def docdir_handler(dir_path, f, stop_wordss=stop_words):
     对某一目录下的所有文档，进行遍历分词和对每篇执行f回调函数
     :param dir_path:
     :param f: f(index, word)，表示第几篇的什么单词，利用全局变量或闭包，引用等完成值传递或者操作
-    :return: void
+    :return: 所有文件名
 
     这是f的一个例子，把每个文档的词连为一个字符串，同时存在列表里
     corpus = []
@@ -29,7 +29,9 @@ def docdir_handler(dir_path, f, stop_wordss=stop_words):
 
     '''
     index = 0
+    filenames = []
     for filename in os.listdir(dir_path):
+        filenames.append(filename)
         try:
             td_file = open(os.path.join(dir_path, filename))
             td_content = td_file.read()
@@ -41,6 +43,7 @@ def docdir_handler(dir_path, f, stop_wordss=stop_words):
             if len(word) > 0 and word not in stop_wordss:
                 f(index, word)
         index += 1
+    return filenames
 
 
 def docfile_handler(filepath, f, stop_wordss=stop_words):

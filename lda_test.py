@@ -39,7 +39,7 @@ if __name__ == '__main__':
     import lda
     import lda.datasets
 
-    model = lda.LDA(n_topics=3, n_iter=500, random_state=1)
+    model = lda.LDA(n_topics=3, n_iter=50, random_state=1)
     model.fit(np.asarray(weight, dtype=np.int32))  # model.fit_transform(X) is also available
 
     ####### 显示结果
@@ -49,6 +49,7 @@ if __name__ == '__main__':
     print(vocab[:3])
     print(topic_word[:, :3])
 
+    # 计算每个主题中的前5个单词
     n = 5
     text = ''
     for i, topic_dist in enumerate(topic_word):
@@ -58,5 +59,14 @@ if __name__ == '__main__':
         text += line_show
 
     print text
+
+    # 计算输入前10篇文章最可能的Topic
+    doc_topic = model.doc_topic_
+    # print("type(doc_topic): {}".format(type(doc_topic)))
+    # print("shape: {}".format(doc_topic.shape))
+    for n in range(len(doc_topic)):
+        topic_most_pr = doc_topic[n].argmax()
+        print("doc: {} topic: {}".format(n, topic_most_pr))
+
 
     word_cloud_util.gen_by_text(text, font_path='resource/simkai.ttf', image_path='resource/cloud.jpg')

@@ -23,7 +23,8 @@ if __name__ == '__main__':
         corpus[index] += ' ' + word
 
 
-    jieba_util.docdir_handler('text_data', f, stop_wordss=[])
+    jieba_util.docdir_handler('text_data', f)
+    # jieba_util.docdir_handler('text_data', f, stop_wordss=[])
     print '语料数据：'
     print '\r\n'.join(corpus)
     # print len(corpus)

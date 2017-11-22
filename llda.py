@@ -66,11 +66,13 @@ class LLDA:
 
         self.z_m_n = []
         self.n_m_z = numpy.zeros((M, self.K), dtype=int)
+        self.n_m = numpy.zeros(M, dtype=int)
         self.n_z_t = numpy.zeros((self.K, V), dtype=int)
         self.n_z = numpy.zeros(self.K, dtype=int)
 
         for m, doc, label in zip(range(M), self.docs, self.labels):
             N_m = len(doc)
+            self.n_m[m] = N_m
             #z_n = [label[x] for x in numpy.random.randint(len(label), size=N_m)]
             z_n = [numpy.random.multinomial(1, label / label.sum()).argmax() for x in range(N_m)]
             self.z_m_n.append(z_n)
@@ -102,6 +104,10 @@ class LLDA:
     def phi(self):
         V = len(self.vocas)
         return (self.n_z_t + self.beta) / (self.n_z[:, numpy.newaxis] + V * self.beta)
+
+    def dhi(self):
+        M = len(self.docs)
+        return (self.n_m_z + self.alpha) / (self.n_m[:, numpy.newaxis] + M * self.alpha)
 
     def theta(self):
         """document-topic distribution"""
