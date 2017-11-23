@@ -48,3 +48,5 @@ env
 venv
 
 *.swp
+
+*.txt
