@@ -81,7 +81,8 @@ if __name__ == '__main__':
     # file.close()
 
     # 测试文件，读取一个目录下所有文件
-    dir_path = 'text_data'
+    # dir_path = 'text_data'
+    dir_path = 'sspider/data'
     #存储读取语料 一行预料为一个文档
     corpus = []
     for filename in os.listdir(dir_path):

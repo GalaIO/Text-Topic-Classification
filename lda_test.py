@@ -16,7 +16,8 @@ if __name__ == '__main__':
         while(len(corpus) <= index):
             corpus.append('')
         corpus[index] += ' ' + word
-    jieba_util.docdir_handler('text_data', f)
+    # jieba_util.docdir_handler('text_data', f)
+    jieba_util.docdir_handler('sspider/data', f)
     # print corpus
     # print len(corpus)
 
@@ -39,21 +40,22 @@ if __name__ == '__main__':
     import lda
     import lda.datasets
 
-    model = lda.LDA(n_topics=3, n_iter=50, random_state=1)
+    topic_num = 5
+    topic_words_count = 10
+    model = lda.LDA(n_topics=topic_num, n_iter=50, random_state=1)
     model.fit(np.asarray(weight, dtype=np.int32))  # model.fit_transform(X) is also available
 
     ####### 显示结果
     topic_word = model.topic_word_
     print("type(topic_word): {}".format(type(topic_word)))
     print("shape: {}".format(topic_word.shape))
-    print(vocab[:3])
-    print(topic_word[:, :3])
+    print(vocab[:topic_num])
+    print(topic_word[:, :topic_num])
 
     # 计算每个主题中的前5个单词
-    n = 5
     text = ''
     for i, topic_dist in enumerate(topic_word):
-        topic_words = np.array(vocab)[np.argsort(topic_dist)][:-(n + 1):-1]
+        topic_words = np.array(vocab)[np.argsort(topic_dist)][:-(topic_words_count + 1):-1]
         line_show = ' '.join(topic_words)
         print('*Topic {}\n- {}'.format(i, line_show))
         text += line_show
@@ -64,9 +66,9 @@ if __name__ == '__main__':
     doc_topic = model.doc_topic_
     # print("type(doc_topic): {}".format(type(doc_topic)))
     # print("shape: {}".format(doc_topic.shape))
-    for n in range(len(doc_topic)):
-        topic_most_pr = doc_topic[n].argmax()
-        print("doc: {} topic: {}".format(n, topic_most_pr))
+    for topic_words_count in range(len(doc_topic)):
+        topic_most_pr = doc_topic[topic_words_count].argmax()
+        print("doc: {} topic: {}".format(topic_words_count, topic_most_pr))
 
 
     word_cloud_util.gen_by_text(text, font_path='resource/simkai.ttf', image_path='resource/cloud.jpg')

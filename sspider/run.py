@@ -6,7 +6,13 @@ reload(sys)
 sys.setdefaultencoding( "utf-8" )
 
 from handler import *
-import re
+import logging
+
+# 配置logging
+logging.basicConfig(level=logging.DEBUG,
+                format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
+                datefmt='%a, %d %b %Y %H:%M:%S',
+                filename='crawling.log')
 
 class Handler(BaseHandler):
     '''
@@ -25,18 +31,21 @@ class Handler(BaseHandler):
             self.crawl(each.attr.href, callback=self.index_page)
         title = response.doc('.art_box h1:first').text()
         content = response.doc('.art_con p').text()
-        print title, content
+        # logging.info(title, content)
         if len(title) and len(content):
+            logging.info('保存...%s' % title)
             with open("data/{}.txt".format(Handler.count), "w") as file:
                 file.write("%s\r\n%s" % (title, content))
                 file.flush()
+                Handler.count += 1
 
     def detail_page(self, response):
-        print {
+        logging.info( {
             "url": response.url,
             "title": response.doc('title').text(),
-        }
+        })
 
 if __name__ == '__main__':
-    instan = Handler()
-    instan.run()
+    instance = Handler()
+    print 'strrt up..............'
+    instance.run()

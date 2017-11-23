@@ -6,7 +6,7 @@ __author__ = 'GalaIO'
 import Queue
 import requests
 from pyquery import PyQuery as pq
-
+import logging
 
 class BaseHandler:
 
@@ -16,6 +16,7 @@ class BaseHandler:
         self.crawl_config = {
             'queue_size': 1000
         }
+        self.url_cached = []
         self.queue = Queue.Queue(self.crawl_config['queue_size'])
 
     def crawl(self, url, callback):
@@ -25,26 +26,34 @@ class BaseHandler:
 
     def run(self):
         if not self.__dict__.has_key('on_start') or not self.__dict__['on_start'].__dict__.has_key('func_name'):
-            print 'you should name a on_start func!'
+            logging.error('you should name a on_start func!')
 
         # 运行初始代码
         self.on_start()
         # 开始从队列取出 执行
         while(self.queue.qsize() > 0):
             url, callback = self.queue.get()
-            print 'crawl %s, callback %s' % (url, callback.func_name)
-            response = requests.get(url)
-            content = response.content
-            response.doc = pq(content.decode(response.apparent_encoding))
+            logging.info('crawl %s, callback %s' % (url, callback.func_name))
+            try:
+                response = requests.get(url)
+                content = response.content
+                response.doc = pq(content.decode(response.apparent_encoding))
+            except Exception, e:
+                logging.warning('%s has a err %s..coding is %s' % (url, e.message, response.encoding if isinstance(response, requests.Response) else 'None'))
+                continue
             callback(response)
 
-        print 'over!!'
+        logging.info('over!!')
 
     def on_start(self):
         pass
 
 
     def check_url_pattern(self, url):
+        # 首先去重
+        if url in self.url_cached:
+            return False
+        self.url_cached.append(url)
         if len(self.url_pattern) <= 0:
             return True
         for pattern in self.url_pattern:
