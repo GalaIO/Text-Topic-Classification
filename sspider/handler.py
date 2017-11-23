@@ -16,6 +16,12 @@ class BaseHandler:
         self.crawl_config = {
             'queue_size': 1000
         }
+        # 从文件读取已爬过的url
+        try:
+            with open('url_saved_file.txt', 'r') as url_saved_file:
+                self.url_cached = [url.strip() for url in url_saved_file.readlines()]
+        except Exception, e:
+            logging.error(e.message)
         self.url_cached = []
         self.queue = Queue.Queue(self.crawl_config['queue_size'])
 
@@ -44,6 +50,11 @@ class BaseHandler:
             callback(response)
 
         logging.info('over!!')
+        # 保存爬取的url路径，为了随后去重
+        url_saved_file = open('url_saved_file.txt', 'w')
+        url_saved_file.write('\r\n'.join(self.url_cached))
+        url_saved_file.flush()
+        url_saved_file.close()
 
     def on_start(self):
         pass

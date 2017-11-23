@@ -21,7 +21,7 @@ if __name__ == '__main__':
     # print corpus
     # print len(corpus)
 
-    word_cloud_util.gen_by_text(corpus[0]+corpus[1]+corpus[2], font_path='resource/simkai.ttf', image_path='resource/cloud.jpg', save_path='re.png')
+    word_cloud_util.gen_by_text(' '.join(corpus), font_path='resource/simkai.ttf', image_path='resource/cloud.jpg', save_path='re.png')
 
     # 将文本中的词语转换为词频矩阵 矩阵元素a[i][j] 表示j词在i类文本下的词频
     vectorizer = CountVectorizer()
@@ -40,8 +40,8 @@ if __name__ == '__main__':
     import lda
     import lda.datasets
 
-    topic_num = 5
-    topic_words_count = 10
+    topic_num = 10
+    topic_words_count = 20
     model = lda.LDA(n_topics=topic_num, n_iter=50, random_state=1)
     model.fit(np.asarray(weight, dtype=np.int32))  # model.fit_transform(X) is also available
 
@@ -60,7 +60,7 @@ if __name__ == '__main__':
         print('*Topic {}\n- {}'.format(i, line_show))
         text += line_show
 
-    print text
+    # print text
 
     # 计算输入前10篇文章最可能的Topic
     doc_topic = model.doc_topic_

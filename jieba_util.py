@@ -1,4 +1,6 @@
 # -*- encoding: utf-8 -*-
+import re
+
 __author__ = 'GalaIO'
 
 import jieba
@@ -8,12 +10,22 @@ import os
 try:
     sw_file = open('resource/stop_words.txt')
     stop_words = [word.strip().decode('utf-8') for word in sw_file.readlines()]
+    swp_file = open('resource/stop_word_pattern.txt')
+    stop_word_patterns = [word.strip().decode('utf-8') for word in swp_file.readlines()]
     # stop_words = []
     # print stop_words
 finally:
     sw_file.close()
 
-def docdir_handler(dir_path, f, stop_wordss=stop_words):
+
+# 匹配停用词规则
+def pattern_check(str, pattern_list):
+    for pattern in pattern_list:
+        if re.match(pattern, str):
+            return True
+    return False
+
+def docdir_handler(dir_path, f, stop_word_list=stop_words, stop_word_pattern_list=stop_word_patterns):
     '''
     对某一目录下的所有文档，进行遍历分词和对每篇执行f回调函数
     :param dir_path:
@@ -40,7 +52,8 @@ def docdir_handler(dir_path, f, stop_wordss=stop_words):
         seg_list = jieba.cut(td_content)
         for word in seg_list:
             word = word.strip()
-            if len(word) > 0 and word not in stop_wordss:
+            # 检查是否是停用词
+            if len(word) > 0 and word not in stop_word_list and not pattern_check(word, stop_word_patterns) :
                 f(index, word)
         index += 1
     return filenames
