@@ -7,6 +7,7 @@ sys.setdefaultencoding( "utf-8" )
 
 import jieba_util
 import word_cloud_util
+import json
 from sklearn.feature_extraction.text import CountVectorizer
 
 if __name__ == '__main__':
@@ -17,12 +18,15 @@ if __name__ == '__main__':
             corpus.append('')
         corpus[index] += ' ' + word
     # jieba_util.docdir_handler('text_data', f)
-    jieba_util.docdir_handler('sspider/data', f)
+    filenames, docs = jieba_util.docdir_handler('sspider/data', f)
     # print corpus
     # print len(corpus)
 
-    word_cloud_util.gen_by_text(' '.join(corpus), font_path='resource/simkai.ttf', image_path='resource/cloud.jpg', save_path='re.png')
+    # print('start wordcloud....')
+    # word_cloud_util.gen_by_text(' '.join(corpus), font_path='resource/simkai.ttf', image_path='resource/cloud.jpg', save_path='re.png')
 
+
+    print ('start vector...')
     # 将文本中的词语转换为词频矩阵 矩阵元素a[i][j] 表示j词在i类文本下的词频
     vectorizer = CountVectorizer()
     # print vectorizer
@@ -42,7 +46,7 @@ if __name__ == '__main__':
 
     topic_num = 10
     topic_words_count = 20
-    model = lda.LDA(n_topics=topic_num, n_iter=50, random_state=1)
+    model = lda.LDA(n_topics=topic_num, n_iter=500, random_state=1)
     model.fit(np.asarray(weight, dtype=np.int32))  # model.fit_transform(X) is also available
 
     ####### 显示结果
@@ -54,10 +58,12 @@ if __name__ == '__main__':
 
     # 计算每个主题中的前5个单词
     text = ''
+    topic_stat = []
     for i, topic_dist in enumerate(topic_word):
         topic_words = np.array(vocab)[np.argsort(topic_dist)][:-(topic_words_count + 1):-1]
         line_show = ' '.join(topic_words)
         print('*Topic {}\n- {}'.format(i, line_show))
+        topic_stat.append({'description': line_show, 'docs': []})
         text += line_show
 
     # print text
@@ -69,6 +75,10 @@ if __name__ == '__main__':
     for topic_words_count in range(len(doc_topic)):
         topic_most_pr = doc_topic[topic_words_count].argmax()
         print("doc: {} topic: {}".format(topic_words_count, topic_most_pr))
+        doc = docs[topic_words_count]
+        topic_stat[topic_most_pr]['docs'].append(doc[:doc.index('\r\n')])
 
+    for top in topic_stat:
+        print '%s\r\n%s\n\n\n' % (top['description'], '\r\n'.join(top['docs']))
 
-    word_cloud_util.gen_by_text(text, font_path='resource/simkai.ttf', image_path='resource/cloud.jpg')
+    # word_cloud_util.gen_by_text(text, font_path='resource/simkai.ttf', image_path='resource/cloud.jpg')

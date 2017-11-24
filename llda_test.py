@@ -17,7 +17,7 @@ def f(index, word):
         corpus.append([])
     corpus[index].append(word)
 
-filenames = jieba_util.docdir_handler('text_data', f)
+filenames, docs = jieba_util.docdir_handler('text_data', f)
 labels = [name.decode('GB2312').rstrip('.txt').split(' ') for name in filenames]
 # print corpus
 # print len(corpus)

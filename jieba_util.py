@@ -30,7 +30,7 @@ def docdir_handler(dir_path, f, stop_word_list=stop_words, stop_word_pattern_lis
     对某一目录下的所有文档，进行遍历分词和对每篇执行f回调函数
     :param dir_path:
     :param f: f(index, word)，表示第几篇的什么单词，利用全局变量或闭包，引用等完成值传递或者操作
-    :return: 所有文件名
+    :return: 所有文件名 和 原始文档
 
     这是f的一个例子，把每个文档的词连为一个字符串，同时存在列表里
     corpus = []
@@ -42,6 +42,9 @@ def docdir_handler(dir_path, f, stop_word_list=stop_words, stop_word_pattern_lis
     '''
     index = 0
     filenames = []
+    docs = []
+    print('start cut....')
+    print('start filter stopword...')
     for filename in os.listdir(dir_path):
         filenames.append(filename)
         try:
@@ -49,6 +52,7 @@ def docdir_handler(dir_path, f, stop_word_list=stop_words, stop_word_pattern_lis
             td_content = td_file.read()
         finally:
             td_file.close()
+        docs.append(td_content)
         seg_list = jieba.cut(td_content)
         for word in seg_list:
             word = word.strip()
@@ -56,7 +60,7 @@ def docdir_handler(dir_path, f, stop_word_list=stop_words, stop_word_pattern_lis
             if len(word) > 0 and word not in stop_word_list and not pattern_check(word, stop_word_patterns) :
                 f(index, word)
         index += 1
-    return filenames
+    return filenames, docs
 
 
 def docfile_handler(filepath, f, stop_wordss=stop_words):
