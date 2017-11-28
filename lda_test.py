@@ -22,8 +22,8 @@ if __name__ == '__main__':
     # print corpus
     # print len(corpus)
 
-    # print('start wordcloud....')
-    # word_cloud_util.gen_by_text(' '.join(corpus), font_path='resource/simkai.ttf', image_path='resource/cloud.jpg', save_path='re.png')
+    print('start wordcloud....')
+    word_cloud_util.gen_by_text(' '.join(corpus), font_path='resource/simkai.ttf', image_path='resource/cloud.jpg', save_path='re.png')
 
 
     print ('start vector...')
@@ -74,11 +74,11 @@ if __name__ == '__main__':
     # print("shape: {}".format(doc_topic.shape))
     for topic_words_count in range(len(doc_topic)):
         topic_most_pr = doc_topic[topic_words_count].argmax()
-        print("doc: {} topic: {}".format(topic_words_count, topic_most_pr))
+        # print("doc: {} topic: {}".format(topic_words_count, topic_most_pr))
         doc = docs[topic_words_count]
-        topic_stat[topic_most_pr]['docs'].append(doc[:doc.index('\r\n')])
+        topic_stat[topic_most_pr]['docs'].append(doc[:doc.index('\n')])
 
     for top in topic_stat:
         print '%s\r\n%s\n\n\n' % (top['description'], '\r\n'.join(top['docs']))
 
-    # word_cloud_util.gen_by_text(text, font_path='resource/simkai.ttf', image_path='resource/cloud.jpg')
+    word_cloud_util.gen_by_text(text, font_path='resource/simkai.ttf', image_path='resource/cloud.jpg')

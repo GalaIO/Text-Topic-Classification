@@ -17,22 +17,25 @@ def f(index, word):
         corpus.append([])
     corpus[index].append(word)
 
-filenames, docs = jieba_util.docdir_handler('text_data', f)
-labels = [name.decode('GB2312').rstrip('.txt').split(' ') for name in filenames]
+filenames, docs = jieba_util.docdir_handler('sspider/data-160', f)
+labels = [['健康', '长寿', '锻炼', '生活', '心理', '饮食']] * len(docs)
+# labels = [[name.decode('GB2312').rstrip('.txt') for name in filenames]] * len(docs)
+# labels = [name.decode('GB2312').rstrip('.txt').split(' ') for name in filenames]
 # print corpus
 # print len(corpus)
-print ', '.join([''.join(i) for i in labels])
+# print ', '.join([''.join(i) for i in labels])
 
 labelset = list(set(reduce(list.__add__, labels)))
 
-llda = LLDA(K=50, alpha=0.001, beta=0.001)
+llda = LLDA(K=50, alpha=0.1, beta=0.01)
 llda.set_corpus(labelset, corpus, labels)
 
 vocab = llda.vocas
+iter_count = 50
 
-print "M=%d, V=%d, L=%d, K=%d, W=%d" % (len(corpus), len(llda.vocas), len(labelset), 50, len(vocab))
+print "M=%d, V=%d, L=%d, K=%d, W=%d" % (len(corpus), len(llda.vocas), len(labelset), iter_count, len(vocab))
 
-for i in range(50):
+for i in range(iter_count):
     sys.stderr.write("-- %d : %.4f\n" % (i, llda.perplexity()))
     llda.inference()
 print "perplexity : %.4f" % llda.perplexity()
@@ -40,7 +43,7 @@ print "perplexity : %.4f" % llda.perplexity()
 topic_word = llda.phi()
 
 # 计算每个主题中的前5个单词
-n = 5
+n = 15
 for k, label in enumerate(labelset):
     # 打印前20个每个label的单词重要度
     # print "\n-- label %d : %s" % (k, label)

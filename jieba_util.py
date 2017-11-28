@@ -49,7 +49,7 @@ def docdir_handler(dir_path, f, stop_word_list=stop_words, stop_word_pattern_lis
         filenames.append(filename)
         try:
             td_file = open(os.path.join(dir_path, filename))
-            td_content = td_file.read()
+            td_content = td_file.read().decode('utf-8')
         finally:
             td_file.close()
         docs.append(td_content)
@@ -97,19 +97,15 @@ if __name__ == '__main__':
     #
     # file.close()
 
-    # 测试文件，读取一个目录下所有文件
-    # dir_path = 'text_data'
-    dir_path = 'sspider/data'
-    #存储读取语料 一行预料为一个文档
+    # 存储读取语料 一行预料为一个文档
     corpus = []
-    for filename in os.listdir(dir_path):
-        td_file = open(os.path.join(dir_path, filename))
-        td_content = td_file.read()
-        td_file.close()
-        seg_list = jieba.cut(td_content)
-        filtered = ''
-        for word in seg_list:
-            word = word.strip()
-            if len(word)>0 and word not in stop_words:
-                filtered += ' /' + word
-        print filtered
+
+
+    def f(index, word):
+        while(len(corpus) <= index):
+            corpus.append('')
+        corpus[index] += ' ' + word
+
+
+    filenames, docs = docdir_handler('sspider/data-20', f)
+    print '\r\n'.join(corpus)
