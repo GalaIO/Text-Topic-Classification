@@ -9,6 +9,7 @@ from handler import *
 import logging
 import re
 import datetime
+import time
 
 # 配置logging
 logging.basicConfig(level=logging.DEBUG,
@@ -61,11 +62,15 @@ class Handler39(BaseHandler):
         content = response.doc('.art_con p').text()
         # logging.info(title, content)
         if len(title) and len(content):
-            logging.info('保存...%s' % title)
-            with open("data/{}-{}.txt".format(Handler39.count_prefix, Handler39.count), "w") as file:
+            logging.info('保存...%s %s' % (response.url, title))
+            with open("data/{}-{}.txt".format(Handler99.count_prefix, Handler99.count), "w") as file:
                 file.write("%s\r\n%s" % (title, content))
                 file.flush()
-                Handler39.count += 1
+                Handler99.count += 1
+        else:
+            logging.info('nothing...%s' % (response.url))
+        # 休眠5秒
+        time.sleep(5)
 
     def detail_page(self, response):
         logging.info( {
@@ -110,11 +115,15 @@ class Handler99(BaseHandler):
         content = response.doc('.inCont p').text()
         # logging.info(title, content)
         if len(title) and len(content):
-            logging.info('保存...%s' % title)
-            with open("data/{}-{}.txt".format(Handler39.count_prefix, Handler39.count), "w") as file:
+            logging.info('保存...%s %s' % (response.url, title))
+            with open("data/{}-{}.txt".format(Handler99.count_prefix, Handler99.count), "w") as file:
                 file.write("%s\r\n%s" % (title, content))
                 file.flush()
-                Handler39.count += 1
+                Handler99.count += 1
+        else:
+            logging.info('nothing...%s' % (response.url))
+        # 休眠5秒
+        time.sleep(5)
 
     def detail_page(self, response):
         logging.info( {

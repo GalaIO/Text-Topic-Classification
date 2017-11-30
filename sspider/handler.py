@@ -47,6 +47,7 @@ class BaseHandler:
             except Exception, e:
                 logging.warning('%s has a err %s..coding is %s' % (url, e.message, response.encoding if isinstance(response, requests.Response) else 'None'))
                 continue
+            logging.info('crawl done, callbbacking...')
             callback(response)
 
         logging.info('over!!')
