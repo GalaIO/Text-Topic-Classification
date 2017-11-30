@@ -18,7 +18,8 @@ if __name__ == '__main__':
             corpus.append('')
         corpus[index] += ' ' + word
     # jieba_util.docdir_handler('text_data', f)
-    filenames, docs = jieba_util.docdir_handler('sspider/data', f)
+    # filenames, docs = jieba_util.docdir_handler('sspider/data', f)
+    filenames, docs = jieba_util.docdir_handler_tfidf('sspider/data', f, scale=0.95)
     # print corpus
     # print len(corpus)
 

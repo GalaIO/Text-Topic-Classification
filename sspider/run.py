@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.DEBUG,
                 datefmt='%a, %d %b %Y %H:%M:%S',
                 filename='crawling.log')
 
-class Handler(BaseHandler):
+class Handler39(BaseHandler):
     '''
     抓取http://oldman.39.net 网站定制
     '''
@@ -62,10 +62,59 @@ class Handler(BaseHandler):
         # logging.info(title, content)
         if len(title) and len(content):
             logging.info('保存...%s' % title)
-            with open("data/{}-{}.txt".format(Handler.count_prefix, Handler.count), "w") as file:
+            with open("data/{}-{}.txt".format(Handler39.count_prefix, Handler39.count), "w") as file:
                 file.write("%s\r\n%s" % (title, content))
                 file.flush()
-                Handler.count += 1
+                Handler39.count += 1
+
+    def detail_page(self, response):
+        logging.info( {
+            "url": response.url,
+            "title": response.doc('title').text(),
+        })
+
+class Handler99(BaseHandler):
+    '''
+    抓取http://oldman.9939.com/ 网站定制
+    '''
+    count_prefix = datetime.datetime.now().strftime('%Y-%m-%d %H-%M-%S')
+    count = 0
+    def __init__(self):
+        BaseHandler.__init__(self)
+        # self.url_pattern = ['^http://oldman.39.net/a.*$', '^/a.*$']
+        self.url_pattern = [
+            '^http://oldman.9939.com/bj.*$',
+            '^http://oldman.9939.com/yinshi.*$',
+            '^http://oldman.9939.com/yangsheng.*$',
+            '^http://oldman.9939.com/lrxl.*$',
+            '^hhttp://oldman.9939.com/lrjs.*$',
+            '^http://oldman.9939.com/jb.*$',
+            '^http://oldman.9939.com/yy.*$',
+        ]
+
+    def on_start(self):
+        self.crawl('http://oldman.9939.com/bj', callback=self.index_page)
+        self.crawl('http://oldman.9939.com/yinshi', callback=self.index_page)
+        self.crawl('http://oldman.9939.com/yangsheng', callback=self.index_page)
+        self.crawl('http://oldman.9939.com/lrxl', callback=self.index_page)
+        self.crawl('http://oldman.9939.com/lrjs', callback=self.index_page)
+        self.crawl('http://oldman.9939.com/jb', callback=self.index_page)
+        self.crawl('http://oldman.9939.com/yy', callback=self.index_page)
+
+    def index_page(self, response):
+        for each in response.doc('a[href^="http"]').items():
+            self.crawl(each.attr.href, callback=self.index_page)
+        # 进一步匹配url 做额外处理
+        # if re.match('^http://oldman.39.net/a.*$', response.url) or re.match('^/a.*$', response.url):
+        title = response.doc('.xqTit').text()
+        content = response.doc('.inCont p').text()
+        # logging.info(title, content)
+        if len(title) and len(content):
+            logging.info('保存...%s' % title)
+            with open("data/{}-{}.txt".format(Handler39.count_prefix, Handler39.count), "w") as file:
+                file.write("%s\r\n%s" % (title, content))
+                file.flush()
+                Handler39.count += 1
 
     def detail_page(self, response):
         logging.info( {
@@ -74,6 +123,9 @@ class Handler(BaseHandler):
         })
 
 if __name__ == '__main__':
-    instance = Handler()
+    # instance = Handler39()
+    # print 'strrt up..............'
+    # instance.run()
+    instance = Handler99()
     print 'strrt up..............'
     instance.run()

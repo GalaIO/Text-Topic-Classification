@@ -11,13 +11,16 @@ import numpy
 
 # 存储读取语料 一行预料为一个文档
 corpus = []
+voc = set()
 
 def f(index, word):
     while (len(corpus) <= index):
         corpus.append([])
     corpus[index].append(word)
+    voc.add(word)
 
-filenames, docs = jieba_util.docdir_handler('sspider/data-160', f)
+filenames, docs = jieba_util.docdir_handler_tfidf('sspider/data-160', f)
+# filenames, docs = jieba_util.docdir_handler('sspider/data-160', f)
 labels = [['健康', '长寿', '锻炼', '生活', '心理', '饮食']] * len(docs)
 # labels = [[name.decode('GB2312').rstrip('.txt') for name in filenames]] * len(docs)
 # labels = [name.decode('GB2312').rstrip('.txt').split(' ') for name in filenames]
@@ -27,7 +30,7 @@ labels = [['健康', '长寿', '锻炼', '生活', '心理', '饮食']] * len(do
 
 labelset = list(set(reduce(list.__add__, labels)))
 
-llda = LLDA(K=50, alpha=0.1, beta=0.01)
+llda = LLDA(K=50, alpha=1.0/len(labels), beta=1.0/len(voc))
 llda.set_corpus(labelset, corpus, labels)
 
 vocab = llda.vocas

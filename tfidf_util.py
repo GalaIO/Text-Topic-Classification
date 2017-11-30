@@ -23,7 +23,8 @@ if __name__ == '__main__':
         corpus[index] += ' ' + word
 
 
-    jieba_util.docdir_handler('text_data', f, stop_word_list=[])
+    # jieba_util.docdir_handler('text_data', f, stop_word_list=[])
+    jieba_util.docdir_handler('sspider/data', f)
     # print corpus
     # print len(corpus)
 
@@ -41,5 +42,9 @@ if __name__ == '__main__':
     for i, row in enumerate(weight):
         row_sorted = np.asarray(word)[np.argsort(row)][:-(n+1):-1]
         line_show = ' '.join(row_sorted)
-        print('*Topic {}\n- {}'.format(i, line_show))
+        print('*topic {}\n- {}'.format(i, line_show))
+
+    col_weight = np.sum(weight, 0)
+    line = np.asarray(word)[np.argsort(col_weight)]
+    print ' '.join(line)
 
