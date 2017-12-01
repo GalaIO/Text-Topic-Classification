@@ -98,6 +98,7 @@ class Handler99(BaseHandler):
         ]
 
     def on_start(self):
+        self.crawl('http://oldman.9939.com/yangsheng/4.shtml', callback=self.index_page)
         self.crawl('http://oldman.9939.com/bj', callback=self.index_page)
         self.crawl('http://oldman.9939.com/yinshi', callback=self.index_page)
         self.crawl('http://oldman.9939.com/yangsheng', callback=self.index_page)
@@ -105,13 +106,14 @@ class Handler99(BaseHandler):
         self.crawl('http://oldman.9939.com/lrjs', callback=self.index_page)
         self.crawl('http://oldman.9939.com/jb', callback=self.index_page)
         self.crawl('http://oldman.9939.com/yy', callback=self.index_page)
-        # self.crawl('http://oldman.9939.com/yangsheng/4.shtml', callback=self.index_page)
 
     def index_page(self, response):
+        logging.info('parse url...')
         for each in response.doc('a[href^="http"]').items():
             self.crawl(each.attr.href, callback=self.index_page)
         # 进一步匹配url 做额外处理
         # if re.match('^http://oldman.39.net/a.*$', response.url) or re.match('^/a.*$', response.url):
+        logging.info('handle doc...')
         title = response.doc('.xqTit').text()
         content = response.doc('.inCont p').text()
         # logging.info(title, content)
