@@ -105,6 +105,7 @@ class Handler99(BaseHandler):
         self.crawl('http://oldman.9939.com/lrjs', callback=self.index_page)
         self.crawl('http://oldman.9939.com/jb', callback=self.index_page)
         self.crawl('http://oldman.9939.com/yy', callback=self.index_page)
+        # self.crawl('http://oldman.9939.com/yangsheng/4.shtml', callback=self.index_page)
 
     def index_page(self, response):
         for each in response.doc('a[href^="http"]').items():
@@ -114,7 +115,7 @@ class Handler99(BaseHandler):
         title = response.doc('.xqTit').text()
         content = response.doc('.inCont p').text()
         # logging.info(title, content)
-        if len(title) and len(content):
+        if len(title) > 0  and len(content) > 0:
             logging.info('保存...%s %s' % (response.url, title))
             with open("data/{}-{}.txt".format(Handler99.count_prefix, Handler99.count), "w") as file:
                 file.write("%s\r\n%s" % (title, content))

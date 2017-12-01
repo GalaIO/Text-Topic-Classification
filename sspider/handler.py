@@ -49,6 +49,7 @@ class BaseHandler:
                 continue
             logging.info('crawl done, callbbacking...')
             callback(response)
+            logging.info('callback done, pulling...')
 
         logging.info('over!!')
         # 保存爬取的url路径，为了随后去重
