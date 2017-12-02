@@ -14,7 +14,7 @@ class BaseHandler:
     def __init__(self):
         self.url_pattern = []
         self.crawl_config = {
-            'queue_size': 1000
+            'queue_size': 100000
         }
         # 从文件读取已爬过的url
         try:
