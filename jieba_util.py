@@ -28,7 +28,7 @@ def pattern_check(str, pattern_list):
             return True
     return False
 
-def docdir_handler(dir_path, f, stop_word_list=stop_words, stop_word_pattern_list=stop_word_patterns):
+def docdir_handler(dir_path, f, stop_word_list=stop_words, stop_word_pattern_list=stop_word_patterns, frange=(0, )):
     '''
     对某一目录下的所有文档，进行遍历分词和对每篇执行f回调函数
     :param dir_path:
@@ -43,13 +43,14 @@ def docdir_handler(dir_path, f, stop_word_list=stop_words, stop_word_pattern_lis
         corpus[index] += ' ' + word
 
     '''
-    index = 0
     filenames = []
     docs = []
     filtered_words = set()
     print('start cut....')
     print('start filter stopword...')
-    for filename in os.listdir(dir_path):
+    for index, filename in enumerate(os.listdir(dir_path)):
+        if (len(frange) > 0 and frange[0] > index) or (len(frange) > 1 and frange[1] <= index):
+            continue
         filenames.append(filename)
         try:
             td_file = open(os.path.join(dir_path, filename))
@@ -66,10 +67,9 @@ def docdir_handler(dir_path, f, stop_word_list=stop_words, stop_word_pattern_lis
             else:
                 # 备份被去掉的单词，加快匹配
                 filtered_words.add(word)
-        index += 1
     return filenames, docs
 
-def docdir_handler_tfidf(dir_path, f, stop_word_list=stop_words, stop_word_pattern_list=stop_word_patterns, scale=0.9):
+def docdir_handler_tfidf(dir_path, f, stop_word_list=stop_words, stop_word_pattern_list=stop_word_patterns, scale=0.9, frange=(0, )):
     '''
     对某一目录下的所有文档，进行遍历分词和对每篇执行f回调函数
     先进行一遍tf-idf去掉 非重要词 默认阈值0.5 即在没文档的tfidf中去掉较小的50%
@@ -85,14 +85,15 @@ def docdir_handler_tfidf(dir_path, f, stop_word_list=stop_words, stop_word_patte
         corpus[index] += ' ' + word
 
     '''
-    index = 0
     filenames = []
     docs = []
     corpus = []
     filtered_words = set()
     print('start cut....')
     print('start filter stopword...')
-    for filename in os.listdir(dir_path):
+    for index, filename in enumerate(os.listdir(dir_path)):
+        if (len(frange) > 0 and frange[0] > index) or (len(frange) > 1 and frange[1] <= index):
+            continue
         filenames.append(filename)
         try:
             td_file = open(os.path.join(dir_path, filename))
@@ -111,13 +112,13 @@ def docdir_handler_tfidf(dir_path, f, stop_word_list=stop_words, stop_word_patte
             else:
                 # 备份被去掉的单词，加快匹配
                 filtered_words.add(word)
-        index += 1
-    vectorizer = CountVectorizer()
+    vectorizer = CountVectorizer(dtype=np.int32)
     transformer = TfidfTransformer()
     tfidf = transformer.fit_transform(
         vectorizer.fit_transform([' '.join(doc) for doc in corpus]))
     vocas = vectorizer.get_feature_names()
-    weight = tfidf.toarray()
+    # weight = tfidf.toarray()
+    weight = tfidf
     tfidf_filtered_count = 0
     # 计算总文档的tf-idf
     col_weight = np.sum(weight, 0)
@@ -182,11 +183,11 @@ if __name__ == '__main__':
         corpus[index] += ' ' + word
 
 
-    filenames, docs = docdir_handler('sspider/data-160', f)
-    print '\r\n'.join(corpus)
-    print datetime.datetime.now()
+    # filenames, docs = docdir_handler('sspider/data-160', f)
+    # print '\r\n'.join(corpus)
+    # print datetime.datetime.now()
 
     corpus = []
-    filenames, docs = docdir_handler_tfidf('sspider/data-160', f)
+    filenames, docs = docdir_handler_tfidf('sspider/data', f, frange=(0, 4000))
     print '\r\n'.join(corpus)
     print datetime.datetime.now()

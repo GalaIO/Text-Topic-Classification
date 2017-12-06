@@ -7,6 +7,7 @@ sys.setdefaultencoding( "utf-8" )
 
 import jieba_util
 import word_cloud_util
+import numpy as np
 import json
 from sklearn.feature_extraction.text import CountVectorizer
 
@@ -19,7 +20,7 @@ if __name__ == '__main__':
         corpus[index] += ' ' + word
     # jieba_util.docdir_handler('text_data', f)
     # filenames, docs = jieba_util.docdir_handler('sspider/data', f)
-    filenames, docs = jieba_util.docdir_handler_tfidf('sspider/data', f, scale=0.95)
+    filenames, docs = jieba_util.docdir_handler_tfidf('sspider/data', f, scale=0.98)
     # print corpus
     # print len(corpus)
 
@@ -29,13 +30,13 @@ if __name__ == '__main__':
 
     print ('start vector...')
     # 将文本中的词语转换为词频矩阵 矩阵元素a[i][j] 表示j词在i类文本下的词频
-    vectorizer = CountVectorizer()
+    vectorizer = CountVectorizer(dtype=np.int32)
     # print vectorizer
 
     X = vectorizer.fit_transform(corpus)
     vocab = vectorizer.get_feature_names()
-    analyze = vectorizer.build_analyzer()
-    weight = X.toarray()
+    # analyze = vectorizer.build_analyzer()
+    # weight = X.toarray()
     # print weight
     # print len(weight)
 
@@ -48,7 +49,7 @@ if __name__ == '__main__':
     topic_num = 10
     topic_words_count = 20
     model = lda.LDA(n_topics=topic_num, n_iter=500, random_state=1)
-    model.fit(np.asarray(weight, dtype=np.int32))  # model.fit_transform(X) is also available
+    model.fit(X)  # model.fit_transform(X) is also available
 
     ####### 显示结果
     topic_word = model.topic_word_
