@@ -19,7 +19,7 @@ def f(index, word):
     corpus[index].append(word)
     voc.add(word)
 
-filenames, docs = jieba_util.docdir_handler_tfidf('sspider/data-160', f)
+filenames, docs = jieba_util.docdir_handler_tfidf('sspider/data', f)
 # filenames, docs = jieba_util.docdir_handler('sspider/data-160', f)
 labels = [['健康', '长寿', '锻炼', '生活', '心理', '饮食']] * len(docs)
 # labels = [[name.decode('GB2312').rstrip('.txt') for name in filenames]] * len(docs)

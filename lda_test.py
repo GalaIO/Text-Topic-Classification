@@ -6,23 +6,60 @@ reload(sys)
 sys.setdefaultencoding( "utf-8" )
 
 import jieba_util
+import os
 import word_cloud_util
 import numpy as np
 import json
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+
+
+def tfidf_filter(corpus, scale=0.9):
+    result = []
+    def result_handler(index, word):
+        while(len(result) <= index):
+            result.append([])
+        result[index].append(word)
+    vectorizer = CountVectorizer(dtype=np.int32)
+    transformer = TfidfTransformer()
+    tfidf = transformer.fit_transform(
+        vectorizer.fit_transform(corpus))
+    vocas = vectorizer.get_feature_names()
+    # weight = tfidf.toarray()
+    weight = tfidf
+    tfidf_filtered_count = 0
+    # 计算总文档的tf-idf
+    col_weight = np.sum(weight, 0)
+    ti = list(np.asarray(vocas)[np.argsort(col_weight)])
+    for index, row in enumerate(weight):
+        # 计算该文档的tf-idf
+        # ti = list(np.asarray(vocas)[np.argsort(row)])
+        for word in corpus[index]:
+            try:
+                if ti.index(word) >= len(vocas) * scale:
+                    result_handler(index, word)
+            except ValueError, e:
+                result_handler(index, word)
+            else:
+                tfidf_filtered_count += 1
+    print 'tf-idf contribute the filter %d' % tfidf_filtered_count
+    return result
 
 if __name__ == '__main__':
-    # 存储读取语料 一行预料为一个文档
-    corpus = []
-    def f(index, word):
-        while(len(corpus) <= index):
-            corpus.append('')
-        corpus[index] += ' ' + word
-    # jieba_util.docdir_handler('text_data', f)
-    # filenames, docs = jieba_util.docdir_handler('sspider/data', f)
-    filenames, docs = jieba_util.docdir_handler_tfidf('sspider/data', f, scale=0.98)
-    # print corpus
-    # print len(corpus)
+    save_file = './data_cut_result.txt'
+    data_dir = 'sspider/data'
+    if os.path.exists(save_file):
+        print 'use chched....'
+        filenames, corpus = jieba_util.load_save_file(save_file)
+        filenames2, docs = jieba_util.load_docs(data_dir)
+    else:
+        print 'caculate....'
+        filenames, docs, corpus = jieba_util.docdir_handler_backup(data_dir, save_filename=save_file)
+        corpus = [' '.join(doc) for doc in corpus]
+
+    print 'tfidf filter...'
+    result = tfidf_filter(corpus, scale=0.99)
+    # 替换为新的语料
+    corpus = [' '.join(doc) for doc in result]
 
     print('start wordcloud....')
     word_cloud_util.gen_by_text(' '.join(corpus), font_path='resource/simkai.ttf', image_path='resource/cloud.jpg', save_path='re.png')
