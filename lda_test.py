@@ -23,24 +23,35 @@ def tfidf_filter(corpus, scale=0.9):
     transformer = TfidfTransformer()
     tfidf = transformer.fit_transform(
         vectorizer.fit_transform(corpus))
+    print 'tfidf train completed...'
     vocas = vectorizer.get_feature_names()
+    vocas_len = len(vocas)
     # weight = tfidf.toarray()
     weight = tfidf
     tfidf_filtered_count = 0
     # 计算总文档的tf-idf
-    col_weight = np.sum(weight, 0)
-    ti = list(np.asarray(vocas)[np.argsort(col_weight)])
-    for index, row in enumerate(weight):
-        # 计算该文档的tf-idf
-        # ti = list(np.asarray(vocas)[np.argsort(row)])
-        for word in corpus[index]:
-            try:
-                if ti.index(word) >= len(vocas) * scale:
-                    result_handler(index, word)
-            except ValueError, e:
-                result_handler(index, word)
+    col_weight = np.sum(weight, 0).tolist()[0]
+    ti = np.asarray(vocas)[np.argsort(col_weight)][::-1]
+    index = 0
+    for doc in corpus:
+        for i in range(int(vocas_len * (1-scale))):
+            if ti[i] in doc:
+                result_handler(index, ti[i])
             else:
                 tfidf_filtered_count += 1
+        index += 1
+    # 计算每个row的重要度
+    # for index, row in enumerate(weight):
+    #     # 计算该文档的tf-idf
+    #     ti = list(np.asarray(vocas)[np.argsort(row)])
+    #     for word in corpus[index]:
+    #         try:
+    #             if ti.index(word) >= len(vocas) * scale:
+    #                 result_handler(index, word)
+    #         except ValueError, e:
+    #             pass
+    #         else:
+    #             tfidf_filtered_count += 1
     print 'tf-idf contribute the filter %d' % tfidf_filtered_count
     return result
 
@@ -63,7 +74,6 @@ if __name__ == '__main__':
 
     print('start wordcloud....')
     word_cloud_util.gen_by_text(' '.join(corpus), font_path='resource/simkai.ttf', image_path='resource/cloud.jpg', save_path='re.png')
-
 
     print ('start vector...')
     # 将文本中的词语转换为词频矩阵 矩阵元素a[i][j] 表示j词在i类文本下的词频

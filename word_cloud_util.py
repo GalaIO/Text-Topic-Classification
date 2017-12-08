@@ -17,7 +17,7 @@ def gen_by_text(text, image_path=None, width=1000, height=1000, font_path=None, 
     :return:
     '''
     # 保证text是unicode编码
-    text = text.decode('utf-8')
+    # text = text.decode('utf-8')
     if font_path is None:
         print 'wordcloud is not support chinese!!!'
     mask = None
